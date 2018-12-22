@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApiTest.Data;
 
 namespace WebApiTest.Controllers
 {
@@ -10,18 +12,29 @@ namespace WebApiTest.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly DataContext _dataContext;
+
+        public ValuesController(DataContext dataContext)
+        {
+            _dataContext = dataContext;
+        }
+
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public async Task<IActionResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            var values = await _dataContext.Values.ToListAsync();
+
+            return Ok(values);
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return "value";
+            var value = await _dataContext.Values.FirstOrDefaultAsync(x => x.Id == id);
+
+            return Ok(value);
         }
 
         // POST api/values

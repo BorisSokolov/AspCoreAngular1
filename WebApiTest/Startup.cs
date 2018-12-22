@@ -6,18 +6,24 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.PlatformAbstractions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using WebApiTest.Data;
 
 namespace WebApiTest
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private IHostingEnvironment _appHost;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment hosting)
         {
             Configuration = configuration;
+            _appHost = hosting;
         }
 
         public IConfiguration Configuration { get; }
@@ -25,6 +31,7 @@ namespace WebApiTest
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<DataContext>(x => x.UseSqlite($"Data Source ={_appHost.ContentRootPath}/DatingApp.db"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
